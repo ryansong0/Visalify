@@ -16,11 +16,22 @@ def analyze_text(text: str):
     for item in rules["managerial_terms"]:
         term = item["term"]
 
-        if term in text_lower:
+        start = 0
+        while True:
+            index = text_lower.find(term, start)
+
+            if index == -1:
+                break
+
             findings.append({
                 "term": term,
+                "matched_text": text[index: index + len(term)],
+                "start": index,
+                "end": index + len(term),
                 "severity": item["severity"],
                 "reason": item["reason"]
             })
+
+            start = index + len(term)
 
     return findings
