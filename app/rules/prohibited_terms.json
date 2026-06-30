@@ -9,12 +9,14 @@
     {
       "term": "lead",
       "severity": "medium",
-      "reason": "Leadership wording can imply supervisory responsibilities"
+      "reason": "Leadership wording can imply supervisory responsibilities",
+      "suggestion": "spearhead, guide, or develop"
     },
     {
       "term": "direct",
       "severity": "high",
-      "reason": "Directing teams suggests managerial duties"
+      "reason": "Directing teams suggests managerial duties",
+      "suggestion": "facilitate, implement"
     },
     {
       "term": "oversee",

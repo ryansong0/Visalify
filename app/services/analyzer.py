@@ -54,7 +54,8 @@ def analyze_text(text: str):
                     "start": index,
                     "end": index + len(term),
                     "severity": item["severity"],
-                    "reason": item["reason"]
+                    "reason": item["reason"],
+                    "suggested_alternative": item.get("suggestion", "rephrase phrase structurally")
                 })
 
                 accumulated_risk += weight
