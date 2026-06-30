@@ -1,14 +1,14 @@
 import json
 import os
 import spacy
-from app.services.rules_loader import load_rules
 
 nlp = spacy.load("en_core_web_sm")
 
 RULES_PATH = os.path.join(os.path.dirname(__file__), "../rules/prohibited_terms.json")
 
 def analyze_text(text: str):
-    rules = load_rules()
+    with open(RULES_PATH, "r") as f:
+        rules = json.load(f)
     findings = []
 
     doc = nlp(text)
