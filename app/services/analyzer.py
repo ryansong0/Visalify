@@ -26,7 +26,7 @@ class ConversationTurnResponse(BaseModel):
     flags: List[ComplianceFlag] = Field(default_factory = list, description = "List of granular violations detected in the text.")
 
 
-def analyze_text(text: str):
+def rules_engine(text: str) -> dict:
     with open(RULES_PATH, "r") as f:
         rules = json.load(f)
     findings = []
@@ -40,16 +40,14 @@ def analyze_text(text: str):
         "high": 70,
         "critical": 100
     }
-
-    total_possible_risk = 0
     accumulated_risk = 0
 
     for item in rules["managerial_terms"]:
         term = item["term"]
-
         start = 0
         severity = item.get("severity", "low").lower()
         weight = severity_weights.get(severity, 10)
+        
         while True:
             index = text_lower.find(term, start)
 
