@@ -49,37 +49,26 @@ with col1:
             st.error("Infrastructure Offline: Please make sure your FastAPI Uvicorn server is running on port 8000.")
 with col2:
     st.subheader("📊 Telemetry Metrics")
+    tel = st.session_state.telemetry
     
-    if analyze_button and job_text:
-        try:
-            response = requests.post("http://127.0.0.1:8000/analyze", json = {"job_description": job_text})
-            
-            if response.status_code == 200:
-                results = response.json()
-                
-                score = results.get("risk_score", 0)
-                level = results.get("overall_risk_level", "Safe")
-                
-                if level in ["Critical", "High"]:
-                    st.error(f"Overall Status: {level} Risk ({score}/100)")
-                elif level == "Medium":
-                    st.warning(f"Overall Status: {level} Risk ({score}/100)")
-                else:
-                    st.success(f"Overall Status: {level} / Compliant ({score}/100)")
-                
-                flags = results.get("flags", [])
-                if flags:
-                    st.markdown(f"### Found {len(flags)} Risk Factors:")
-                    for idx, flag in enumerate(flags):
-                        with st.expander(f"⚠️ Flag #{idx+1}: '{flag['matched_text']}' ({flag['severity'].upper()})"):
-                            st.markdown(f"**Reason:** {flag['reason']}")
-                            st.info(f"💡 **Suggested Rephrasing:** {flag['suggested_alternative']}")
-                else:
-                    st.balloons()
-                    st.success("✨ Zero compliance regularities or structural risks detected!")
-            else:
-                st.error("Engine Communication Error: Backend API returned a faulty status code.")
-        except requests.exceptions.ConnectionError:
-            st.error("Infrastructure Offline: Please make sure your FastAPI Uvicorn server is running on port 8000.")
+    score = tel.get("risk_score", 0)
+    level = tel.get("overall_risk_level", "Safe")
+    more_info = tel.get("requires_more_info", False)
+    
+    if more_info:
+        st.info("🔄 Status: Awaiting Details (Gathering clearer context from dialogue)")
+    elif level in ["Critical", "High"]:
+        st.error(f"🚨 Status: {level} Risk ({score}/100)")
+    elif level == "Medium":
+        st.warning(f"⚠️ Status: {level} Risk ({score}/100)")
     else:
-        st.info("Awaiting input text. Input a description and click analyze to populate compliance telemetry.")
+        st.success(f"✅ Status: {level} / Compliant ({score}/100)")
+        st.balloons()
+        
+    flags = tel.get("flags", [])
+    if flags:
+        st.markdown(f"### Highlighted Risk Metrics ({len(flags)})")
+        for idx, flag in enumerate(flags):
+            with st.expander(f"Violation #{idx+1}: '{flag.get('matched_text')}'"):
+                st.markdown(f"**Reason:** {flag.get('reason')}")
+                st.info(f"💡 **Suggested Correction:** {flag.get('suggested_alternative')}")
