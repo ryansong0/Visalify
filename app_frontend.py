@@ -15,47 +15,11 @@ if "telemetry" not in st.session_state:
         "risk_score": 0, "overall_risk_level": "Safe", "flags": [], "requires_more_info": True
     }
 
-def render_highlighted_text(text, flags):
-    if not flags:
-        st.write(text)
-        return
-
-    sorted_flags = sorted(flags, key = lambda x: x["start"])
-
-    annotated_fragments = []
-    current_idx = 0
-
-    for flag in sorted_flags:
-        start = flag["start"]
-        end = flag["end"]
-        term = flag["matched_text"]
-        severity = flag["severity"].upper()
-
-        color_map = {"CRITICAL": "#ff4b4b", "HIGH": "#ffa500", "MEDIUM": "#ffeb3b", "LOW": "#f0f2f6"}
-        bg_color = color_map.get(severity, "#f0f2f6")
-        text_color = "#000000" if severity in ["MEDIUM", "LOW"] else "#ffffff"
-
-        if start > current_idx:
-            annotated_fragments.append(text[current_idx: start])
-
-        annotated_fragments.append((term, f"{severity}", bg_color, text_color))
-        current_idx = end
-
-    if current_idx < len(text):
-        annotated_fragments.append(text[current_idx:])
-
-    annotated_text(*annotated_fragments)
-
-
 col1, col2 = st.columns([3, 2])
 
 with col1:
-    st.subheader("📋 Input Job Description")
-    job_text = st.text_area(
-        "Paste the raw role responsibilities below:", 
-        height = 300, 
-        placeholder = "e.g., You will manage a team of engineers and oversee our code deployment pipelines..."
-    )
+    st.subheader("💬 Compliance Consultation")
+    
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
             st.write(msg["content"])
@@ -64,18 +28,25 @@ with col1:
         st.session_state.messages.append({"role": "user", "content": user_input})
         with st.chat_message("user"):
             st.write(user_input)
-    analyze_button = st.button("Run Compliance Audit", type = "primary", use_container_width = True)
 
-    if analyze_button and job_text:
-        st.subheader("🔍 Contextual Analysis & Highlights")
         try:
-            response = requests.post("http://127.0.0.1:8000/analyze", json={"job_description": job_text})
+            response = requests.post("http://127.0.0.1:8000/chat", 
+            json = {"history": st.session_state.messages}
+            )
             if response.status_code == 200:
                 results = response.json()
-                render_highlighted_text(job_text, results.get("flags", []))
-        except requests.exceptions.ConnectionError:
-            pass
 
+                agent_reply = results.get("agent_message", "Analysis processed.")
+                st.session_state.messages.append({"role": "assistant", "content": agent_reply})
+                with st.chat_message("assistant"):
+                    st.write(agent_reply)
+
+                st.session_state.telemetry = results
+                st.rerun()
+            else:
+                st.error("Engine Communication Error: Backend API returned a faulty status code.")
+        except requests.exceptions.ConnectionError:
+            st.error("Infrastructure Offline: Please make sure your FastAPI Uvicorn server is running on port 8000.")
 with col2:
     st.subheader("📊 Telemetry Metrics")
     
