@@ -116,3 +116,33 @@ class ComplianceAgentService:
             "2. If the user's text is extremely short or vague (e.g., 'I run things'), ask clarifying follow-up questions instead of clearing them. Set requires_more_info = True.\n"
             "3. Synthesize the findings from the tool in your conversational 'agent_message'. Return the final output adhering perfectly to the required JSON schema."
         )
+
+        contents = []
+        for msg in conversation_history:
+            role = "user" if msg["role"] == "user" else "model"
+            contents.append(types.Content(
+                role=role, parts=[types.Part.from_text(text=msg["content"])]
+            ))
+
+        try:
+            response = self.client.models.generate_content(
+                model = self.model_id,
+                contents = contents,
+                config = types.GenerateContentConfig(
+                    system_instruction = system_instruction,
+                    tools = [rules_engine], # Pass your spaCy rule checker directly to the LLM
+                    response_mime_type = "application/json",
+                    response_schema = ConversationTurnResponse,
+                    temperature = 0.2
+                )
+            )
+            return response.text
+        except Exception as e:
+            # Fallback error payload
+            fallback = ConversationTurnResponse(
+                agent_message = f"I encountered a problem processing this turn. (System Error: {str(e)})",
+                requires_more_info = True
+            )
+            return fallback.model_dump_json()
+
+agent_service = ComplianceAgentService()
