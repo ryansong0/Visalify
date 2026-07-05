@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List
 import numpy as np
+import requests
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 import uvicorn
@@ -46,7 +47,7 @@ class ChatMessage(BaseModel):
     content: str
 
 class ChatHistoryRequest(BaseModel):
-    history: List[ChatMessage]
+    history: List[dict]
 
 class RiskFlag(BaseModel):
     matched_text: str
@@ -80,9 +81,9 @@ def vector_compliance_scan(latest_input: str, threshold: float = 0.42) -> tuple:
             max_observed_score = max(max_observed_score, scaled_penalty)
 
             flags.append(RiskFlag(
-                matched_text=rule["anchor_phrases"][max_sim_idx],
-                reason=f"Matched regulatory restriction context via category '{rule['category']}' (Semantic Confidence: {highest_similarity:.2f}). {rule['reason']}",
-                suggested_alternative=rule["alternative"]
+                matched_text = rule["anchor_phrases"][max_sim_idx],
+                reason = f"Matched regulatory restriction context via category '{rule['category']}' (Semantic Confidence: {highest_similarity:.2f}). {rule['reason']}",
+                suggested_alternative = rule["alternative"]
             ))
 
     risk_score = min(100, max_observed_score)
@@ -103,11 +104,7 @@ def vector_compliance_scan(latest_input: str, threshold: float = 0.42) -> tuple:
 
 @app.post("/chat", response_model = ChatAnalysisResponse)
 async def analyze_compliance_dialogue(payload: ChatHistoryRequest):
-    if not payload.history:
-        raise HTTPException(status_code = 400, detail = "Dialogue history cannot be empty.")
-        
-    # 1. Extract user state
-    user_messages = [m.content for m in payload.history if m.role == "user"]
+    user_messages = [m["content"] for m in payload.history if m["role"] == "user"]
     if not user_messages:
         return ChatAnalysisResponse(
             agent_message = "I'm ready when you are. Please paste a job description or list your core responsibilities.",
@@ -119,35 +116,37 @@ async def analyze_compliance_dialogue(payload: ChatHistoryRequest):
         
     latest_user_input = user_messages[-1]
 
-    knowledge_base = {
-        "management consultant": {
-            "reason": "Explicitly flagged under 8 CFR 214.6. Management consultants must strictly operate in an advisory capacity, not operational management or day-to-day execution.",
-            "alternative": "Reframe responsibilities around 'strategic evaluation', 'process auditing', or 'operational assessment'.",
-            "weight": 50
-        },
-        "software engineer": {
-            "reason": "While highly technical, using generalized software engineering titles under the 'Engineer' category requires strict alignment with an engineering degree. Borderline or non-traditional degrees invite heavy RFE scrutiny.",
-            "alternative": "Specify the scientific or mathematical foundations of your systems engineering work.",
-            "weight": 25
-        },
-        "product manager": {
-            "reason": "Product Management is not a recognized statutory profession under the TN classification system. High risk of immediate denial if not aligned under a valid engineering or scientific category.",
-            "alternative": "Re-evaluate if duties align with 'Computer Systems Analyst' or 'Engineer', focusing entirely on architecture rather than business metrics.",
-            "weight": 80
-        }
-    }
-
-    risk_score, risk_level, requires_more, flags = compute_compliance_telemetry(
-        latest_user_input, knowledge_base
+    risk_score, risk_level, requires_more, flags = vector_compliance_scan(
+        latest_user_input
     )
 
-    if risk_level in ["Critical", "High"]:
-        reply = f"Analysis complete. I've flagged severe compliance conflicts with 8 CFR regulations. Specifically, the vocabulary matches patterns related to non-qualifying or heavily scrutinized roles like {', '.join([f.matched_text for f in flags])}. Look at the sidebar metrics for specific structural rewrites."
-    elif requires_more:
-        reply = "I've processed that phrase, but I need more details regarding your day-to-day responsibilities, reporting structure, and minimum degree requirements to generate an accurate risk matrix."
-    else:
-        reply = "The provided description shows high structural compliance alignment with standard TN occupational criteria. Keep regular monitoring active."
+    flag_context = "\n".join([f"- Context Flag: '{f.matched_text}'\n  Reason: {f.reason}" for f in flags])
 
+    system_prompt = f"""
+    You are VisaGuard AI, an expert immigration compliance assistant specializing in 8 CFR 214.6 regulations.
+    Current Telemetry: Risk Score {risk_score}/100, Tier: {risk_level}.
+    {flag_context}
+    
+    INSTRUCTIONS:
+    Be concise (under 4 sentences). Identify why the phrasing sounds non-compliant. Provide a 1-sentence compliant rewrite alternative.
+    """
+
+    try:
+        ollama_url = "http://127.0.0.1:11434/api/generate"
+        ollama_payload = {
+            "model": "llama3",
+            "prompt": f"{system_prompt}\n\nUser Input to Analyze: {latest_user_input}",
+            "stream": False
+        }
+        
+        response = requests.post(ollama_url, json=ollama_payload, timeout=20)
+        if response.status_code == 200:
+            reply = response.json().get("response", "Analysis processed.")
+        else:
+            reply = "Local AI loop tracking anomaly. Please verify Ollama system runtime parameters."
+    except requests.exceptions.ConnectionError:
+        reply = "⚠️ AI Helper Engine Offline. Ensure Ollama is running locally via 'ollama run llama3' in your terminal to receive automated compliance rewrites."
+    
     return ChatAnalysisResponse(
         agent_message = reply,
         risk_score = risk_score,
