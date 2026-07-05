@@ -36,6 +36,7 @@ with col1:
             if response.status_code == 200:
                 results = response.json()
 
+
                 agent_reply = results.get("agent_message", "Analysis processed.")
                 st.session_state.messages.append({"role": "assistant", "content": agent_reply})
                 with st.chat_message("assistant"):
