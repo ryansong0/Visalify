@@ -87,3 +87,25 @@ async def analyze_compliance_dialogue(payload: ChatHistoryRequest):
             "weight": 80
         }
     }
+
+    risk_score, risk_level, requires_more, flags = compute_compliance_telemetry(
+        latest_user_input, knowledge_base
+    )
+
+    if risk_level in ["Critical", "High"]:
+        reply = f"Analysis complete. I've flagged severe compliance conflicts with 8 CFR regulations. Specifically, the vocabulary matches patterns related to non-qualifying or heavily scrutinized roles like {', '.join([f.matched_text for f in flags])}. Look at the sidebar metrics for specific structural rewrites."
+    elif requires_more:
+        reply = "I've processed that phrase, but I need more details regarding your day-to-day responsibilities, reporting structure, and minimum degree requirements to generate an accurate risk matrix."
+    else:
+        reply = "The provided description shows high structural compliance alignment with standard TN occupational criteria. Keep regular monitoring active."
+
+    return ChatAnalysisResponse(
+        agent_message = reply,
+        risk_score = risk_score,
+        overall_risk_level = risk_level,
+        requires_more_info = requires_more,
+        flags = flags
+    )
+
+if __name__ == "__main__":
+    uvicorn.run("main.py:app", host = "127.0.0.1", port = 8000, reload = True)
