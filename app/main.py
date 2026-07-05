@@ -1,9 +1,42 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List
+import numpy as np
+from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
 import uvicorn
 
-app = FastAPI(title = "VisaGuard Compliance Engine", version = "1.0")
+app = FastAPI(title = "VisaGuard Compliance Engine (Vector Edition)", version = "2.0")
+
+print("Loading semantic embedding model...")
+model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+
+REGULATORY_KB = [
+    {
+        "category": "Management Consultant",
+        "anchor_phrases": [
+            "managing day to day operations and staff",
+            "execution of corporate business strategy",
+            "operating in a daily managerial or executive capacity",
+            "directing product lines and project management timelines"
+        ],
+        "reason": "Explicitly flagged under 8 CFR 214.6. Management consultants must strictly operate in an advisory capacity, not operational management or day-to-day execution.",
+        "alternative": "Reframe responsibilities around 'strategic evaluation', 'process auditing', or 'operational assessment'.",
+        "base_weight": 60
+    },
+    {
+        "category": "Non-Statutory Product Management",
+        "anchor_phrases": [
+            "owning product roadmap and business market fit",
+            "cross functional team leadership and revenue metrics",
+            "managing feature prioritization and marketing alignment",
+            "product manager responsible for lifecycle execution"
+        ],
+        "reason": "Product Management is not a recognized statutory profession under the TN classification system. High risk of immediate denial if not aligned under a valid engineering or scientific category.",
+        "alternative": "Re-evaluate if duties align with 'Computer Systems Analyst' or 'Engineer', focusing entirely on architecture rather than business metrics.",
+        "base_weight": 85
+    }
+]
 
 class ChatMessage(BaseModel):
     role: str
