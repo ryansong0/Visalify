@@ -60,20 +60,9 @@ class ChatAnalysisResponse(BaseModel):
     requires_more_info: bool
     flags: List[RiskFlag]
 
-def compute_compliance_telemetry(latest_input: str, high_risk_tokens: list) -> tuple:
-    flags = []
-    base_score = 0
 
-    for trigger, metadata in high_risk_tokens.items():
-        if trigger.lower() in latest_input.lower():
-            flags.append(RiskFlag(
-                matched_text = trigger,
-                reason = metadata["reason"],
-                suggested_alternative = metadata["alternative"]
-            ))
-            base_score += metadata["weight"]
+def vector_compliance_scan(latest_input: str, SIMID_THRESHOLD: float = 0.42) -> tuple:
 
-    risk_score = min(100, base_score)
     
     if risk_score >= 75:
         level = "Critical"
