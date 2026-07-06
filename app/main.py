@@ -85,7 +85,7 @@ def vector_compliance_scan(latest_input: str, threshold: float = 0.42) -> tuple:
         highest_similarity = similarities[sent_idx, anchor_idx]
 
         if highest_similarity > threshold:
-            scaled_penalty = int(rule["base_weight"] * (highest_similarity ** 2))
+            scaled_penalty = int(rule["base_weight"] * highest_similarity)
             max_observed_score = max(max_observed_score, scaled_penalty)
 
             flags.append(RiskFlag(
