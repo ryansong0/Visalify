@@ -7,6 +7,7 @@ from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 import uvicorn
 import traceback
+import re
 
 app = FastAPI(title = "VisaGuard Compliance Engine (Vector Edition)", version = "2.0")
 
@@ -70,19 +71,25 @@ def vector_compliance_scan(latest_input: str, threshold: float = 0.42) -> tuple:
     if not latest_input.strip():
         return 0, "Safe", True, []
     
-    user_embedding = model.encode([latest_input])
+    sentences = [s.strip() for s in re.split(r'[.\n!]+', latest_input) if s.strip()]
+
+    if not sentences:
+        return 0, "Safe", True, []
+    
+    sentence_embeddings = model.encode(sentences)
 
     for rule in REGULATORY_KB:
-        similarities = cosine_similarity(user_embedding, rule["embeddings"])[0]
-        max_sim_idx = np.argmax(similarities)
-        highest_similarity = similarities[max_sim_idx]
+        similarities = cosine_similarity(sentence_embeddings, rule["embeddings"])
+        flat_max_idx = np.argmax(similarities)
+        sent_idx, anchor_idx = divmod(flat_max_idx, similarities.shape[1])
+        highest_similarity = similarities[sent_idx, anchor_idx]
 
         if highest_similarity > threshold:
             scaled_penalty = int(rule["base_weight"] * (highest_similarity ** 2))
             max_observed_score = max(max_observed_score, scaled_penalty)
 
             flags.append(RiskFlag(
-                matched_text = rule["anchor_phrases"][max_sim_idx],
+                matched_text = rule["anchor_phrases"][anchor_idx],
                 reason = f"Matched regulatory restriction context via category '{rule['category']}' (Semantic Confidence: {highest_similarity:.2f}). {rule['reason']}",
                 suggested_alternative = rule["alternative"]
             ))
