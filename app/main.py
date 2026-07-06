@@ -140,7 +140,7 @@ async def analyze_compliance_dialogue(payload: ChatHistoryRequest):
             "stream": False
         }
         
-        response = requests.post(ollama_url, json = ollama_payload, timeout = 20)
+        response = requests.post(ollama_url, json = ollama_payload, timeout = 60)
         if response.status_code == 200:
             reply = response.json().get("response", "Analysis processed.")
         else:
