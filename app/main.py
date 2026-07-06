@@ -135,7 +135,7 @@ async def analyze_compliance_dialogue(payload: ChatHistoryRequest):
     try:
         ollama_url = "http://127.0.0.1:11434/api/generate"
         ollama_payload = {
-            "model": "llama3",
+            "model": "llama3.2:latest",
             "prompt": f"{system_prompt}\n\nUser Input to Analyze: {latest_user_input}",
             "stream": False
         }
