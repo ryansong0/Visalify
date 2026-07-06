@@ -130,7 +130,7 @@ async def analyze_compliance_dialogue(payload: ChatHistoryRequest):
         latest_user_input
     )
 
-    flag_context = "\n".join([f"- Context Flag: '{f.matched_text}'\n  Reason: {f.reason}" for f in flags])
+    flag_context = "\n".join([f"- Context Flag: '{f.get('matched_text')}'\n  Reason: {f.get('reason')}" for f in flags])
 
     system_prompt = f"""
     You are VisaGuard AI, an expert immigration compliance attorney specializing in 8 CFR 214.6 regulations.
@@ -159,6 +159,15 @@ async def analyze_compliance_dialogue(payload: ChatHistoryRequest):
         response = requests.post(ollama_url, json = ollama_payload, timeout = 60)
         if response.status_code == 200:
             reply = response.json().get("response", "Analysis processed.")
+
+            if "VERDICT: SAFE" in reply.upper():
+                risk_score = 0
+                risk_level = "Safe"
+                flags = []
+                requires_more = False
+
+            if "EXPLANATION:" in reply:
+                    reply = reply.split("EXPLANATION:")[-1].strip()
         else:
             reply = "Local AI loop tracking anomaly. Please verify Ollama system runtime parameters."
     except Exception as e:
