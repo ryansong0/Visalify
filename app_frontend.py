@@ -53,6 +53,8 @@ with col1:
         st.session_state.messages.append({"role": "user", "content": user_input})
         with st.chat_message("user"):
             st.write(user_input)
+        
+        st.session_state.telemetry = {"risk_score": 0, "overall_risk_level": "Pending", "flags": [], "requires_more_info": True, "has_evaluated": False}
 
         try:
             response = requests.post("http://127.0.0.1:8000/chat", 
@@ -89,9 +91,11 @@ with col2:
             if extracted_text:
                 st.session_state.messages.append({"role": "user", "content": f"[PDF Document Uploaded]:\n\n{extracted_text}"})
                 
+                st.session_state.telemetry = {"risk_score": 0, "overall_risk_level": "Pending", "flags": [], "requires_more_info": True, "has_evaluated": False}
+
                 try:
                     response = requests.post("http://127.0.0.1:8000/chat", 
-                        json={"history": st.session_state.messages}
+                        json = {"history": st.session_state.messages}
                     )
                     if response.status_code == 200:
                         results = response.json()
