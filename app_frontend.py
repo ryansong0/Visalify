@@ -70,6 +70,7 @@ with col1:
                 agent_reply = results.get("agent_message", "Analysis processed.")
                 st.session_state.messages.append({"role": "assistant", "content": agent_reply})
                 st.session_state.telemetry = results
+                st.rerun()
             else:
                 st.error("Engine Communication Error: Backend API returned a faulty status code.")
         except requests.exceptions.ConnectionError:
@@ -128,7 +129,6 @@ with col2:
             annotated_html = highlight_text(user_inputs[-1], flags)
             st.markdown(f"<div style='border: 1px solid #ddd; padding: 10px; border-radius: 5px; max-height: 250px; overflow-y: auto;'>{annotated_html}</div>", unsafe_allow_html=True)
 
-        st.markdown(f"### Highlighted Risk Metrics ({len(flags)})")
         for idx, flag in enumerate(flags):
             with st.expander(f"Violation #{idx+1}: '{flag.get('matched_text')}'"):
                 st.markdown(f"**Reason:** {flag.get('reason')}")
