@@ -9,6 +9,31 @@ st.set_page_config(
     initial_sidebar_state = "expanded"
 )
 
+st.markdown("""
+    <style>
+    /* main background and fonts */
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+    
+    html, body, [data-testid="stAppViewContainer"] {
+        background-color: #0d1117;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: #c9d1d9;
+    }
+            
+    /* technical code accents */
+    code, pre, [data-testid="stMarkdownContainer"] pre code {
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 13px;
+    }
+    
+    /* left sidebar styling */
+    [data-testid="stSidebar"] {
+        background-color: #161b22 !important;
+        border-right: 1px solid #30363d;
+    }
+    </style>
+""", unsafe_allow_html = True)
+
 def highlight_text(full_text: str, flags: list):
     highlighted = full_text
     for flag in flags:
