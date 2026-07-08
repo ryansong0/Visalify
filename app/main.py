@@ -80,12 +80,18 @@ def vector_compliance_scan(latest_input: str, threshold: float = 0.42) -> tuple:
     sentence_embeddings = model.encode(sentences)
 
     for s_idx, s_embed in enumerate(sentence_embeddings):
-        s_embed_reshaped = s_embed.reshape(1, -1)
+        s_vec = s_embed.flatten()
 
         for rule in REGULATORY_KB:
-            similarities = cosine_similarity(s_embed_reshaped, rule["embeddings"])[0]
-            best_anchor_idx = np.argmax(similarities)
-            highest_similarity = similarities[best_anchor_idx]
+            highest_similarity = -1.0
+
+            for anchor_idx, anchor_embed in enumerate(rule["embeddings"]):
+                a_vec = anchor_embed.flatten()
+            
+                sim = np.dot(s_vec, a_vec) / (np.linalg.norm(s_vec) * np.linalg.norm(a_vec))
+                
+                if sim > highest_similarity:
+                    highest_similarity = sim
 
             if highest_similarity > threshold:
                 scaled_penalty = int(rule["base_weight"] * highest_similarity)
