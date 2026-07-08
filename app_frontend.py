@@ -74,6 +74,23 @@ st.markdown("""
     </style>
 """, unsafe_allow_html = True)
 
+with st.sidebar:
+    st.markdown("<h2 style='color:#58a6ff; font-family:\"JetBrains Mono\"; font-size:18px;'>⚡ SYSTEM METRICS</h2>", unsafe_allow_html = True)
+    st.markdown("---")
+    st.markdown("**LLM Gateway Core:** `llama3.2:latest` (Ollama Engine)")
+    st.markdown("**Parser Standard:** `8 CFR 214.6 (TN-1/2)`")
+    st.markdown("**NLP Vector Embeddings:** Cosine Similarity Matrix")
+    st.markdown("---")
+    st.markdown("<h3 style='font-size:14px; font-family:\"JetBrains Mono\";'>SYSTEM UTILITIES</h3>", unsafe_allow_html = True)
+    
+    if st.button("🔄 Flush Telemetry Cache", use_container_width = True):
+        st.session_state.messages = []
+        st.session_state.telemetry = {
+            "risk_score": 0, "overall_risk_level": "Pending", 
+            "flags": [], "requires_more_info": True, "has_evaluated": False
+        }
+        st.rerun()
+
 def highlight_text(full_text: str, flags: list):
     highlighted = full_text
     for flag in flags:
