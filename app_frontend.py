@@ -91,6 +91,10 @@ with st.sidebar:
         }
         st.rerun()
 
+st.markdown("<h1 style='color:#ffffff; font-size: 28px; letter-spacing: -0.5px;'>VisaGuard <span style='color:#58a6ff; font-family:\"JetBrains Mono\"; font-size:16px;'>v2.0 // Compliance Analyzer</span></h1>", unsafe_allow_html=True)
+st.markdown("<p style='color:#8b949e; margin-top:-10px; font-size:14px;'>Automated statutory risk auditing framework for professional visa engineering applications.</p>", unsafe_allow_html = True)
+st.markdown("---")
+
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "telemetry" not in st.session_state:
@@ -98,9 +102,45 @@ if "telemetry" not in st.session_state:
         "risk_score": 0, "overall_risk_level": "Pending", "flags": [], "requires_more_info": True, "has_evaluated": False
     }
 
-st.markdown("<h1 style='color:#ffffff; font-size: 28px; letter-spacing: -0.5px;'>VisaGuard <span style='color:#58a6ff; font-family:\"JetBrains Mono\"; font-size:16px;'>v2.0 // Compliance Analyzer</span></h1>", unsafe_allow_html=True)
-st.markdown("<p style='color:#8b949e; margin-top:-10px; font-size:14px;'>Automated statutory risk auditing framework for professional visa engineering applications.</p>", unsafe_allow_html = True)
-st.markdown("---")
+col_left, col_right = st.columns([3, 2], gap="large")
+
+with col_left:
+    st.markdown("<h3 style='font-size:16px; font-family:\"JetBrains Mono\"; color:#8b949e;'>[01] INPUT CHANNELS</h3>", unsafe_allow_html=True)
+    
+    uploaded_file = st.file_uploader("Drop PDF or Text Job Specifications here", type=["pdf", "txt"], label_visibility="collapsed")
+    if uploaded_file:
+        pass
+
+    st.markdown("---")
+    st.markdown("<h3 style='font-size:16px; font-family:\"JetBrains Mono\"; color:#8b949e;'>[02] ANALYST DIALOGUE</h3>", unsafe_allow_html=True)
+    
+    for msg in st.session_state.messages:
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
+
+    if user_input := st.chat_input("Input role description or ask follow-up questions..."):
+        st.session_state.messages.append({"role": "user", "content": user_input})
+        with st.chat_message("user"):
+            st.markdown(user_input)
+            
+        st.session_state.telemetry = {"risk_score": 0, "overall_risk_level": "Pending", "flags": [], "requires_more_info": True, "has_evaluated": True}
+        
+        try:
+            res = requests.post("http://127.0.0.1:8000/chat", json={"history": st.session_state.messages})
+            if res.status_code == 200:
+                data = res.json()
+                st.session_state.messages.append({"role": "assistant", "content": data["agent_message"]})
+                
+                st.session_state.telemetry = {
+                    "risk_score": data["risk_score"],
+                    "overall_risk_level": data["overall_risk_level"],
+                    "flags": data["flags"],
+                    "requires_more_info": data["requires_more_info"],
+                    "has_evaluated": True
+                }
+                st.rerun()
+        except Exception as e:
+            st.error(f"Failed to communicate with runtime compliance engine: {e}")
 
 def highlight_text(full_text: str, flags: list):
     highlighted = full_text
