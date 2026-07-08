@@ -42,7 +42,8 @@ REGULATORY_KB = [
 ]
 
 for rule in REGULATORY_KB:
-    rule["embeddings"] = model.encode(rule["anchor_phrases"])
+    encoded_phrases = model.encode(rule["anchor_phrases"])
+    rule["embeddings"] = [np.array(vector).flatten() for vector in encoded_phrases]
 
 class ChatMessage(BaseModel):
     role: str
@@ -84,11 +85,13 @@ def vector_compliance_scan(latest_input: str, threshold: float = 0.42) -> tuple:
 
         for rule in REGULATORY_KB:
             highest_similarity = -1.0
-
-            for anchor_idx, anchor_embed in enumerate(rule["embeddings"]):
-                a_vec = anchor_embed.flatten()
             
-                sim = np.dot(s_vec, a_vec) / (np.linalg.norm(s_vec) * np.linalg.norm(a_vec))
+            for anchor_embed in rule["embeddings"]:
+                norm_product = np.linalg.norm(s_vec) * np.linalg.norm(anchor_embed)
+                if norm_product == 0:
+                    sim = 0.0
+                else:
+                    sim = float(np.dot(s_vec, anchor_embed) / norm_product)
                 
                 if sim > highest_similarity:
                     highest_similarity = sim
