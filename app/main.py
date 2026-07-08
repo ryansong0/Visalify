@@ -148,10 +148,11 @@ async def analyze_compliance_dialogue(payload: ChatHistoryRequest):
     CRITICAL RULES:
     1. If the text mentions managing people, budgets, team direction, or corporate strategy execution, you must classify it as a heavy structural failure. Start your response with 'VERDICT: CRITICAL_HIGH_RISK'.
     2. If the text involves consulting overlaps or advisory execution, start your response with 'VERDICT: MEDIUM_RISK'.
-    3. If the flags were explicitly negated or excluded (e.g., 'no personnel management responsibilities'), start your response with 'VERDICT: SAFE'.
+    3. If the duties describe routine maintenance, basic IT support, helpdesk tickets, or manual tasks rather than high-level analytical engineering design, start your response with 'VERDICT: LOW_RISK'.
+    4. If the flags were explicitly negated or excluded (e.g., 'no personnel management responsibilities'), start your response with 'VERDICT: SAFE'.
     
     You MUST respond using this exact text layout:
-    VERDICT: [CRITICAL_HIGH_RISK, MEDIUM_RISK, or SAFE]
+    VERDICT: [CRITICAL_HIGH_RISK, MEDIUM_RISK, LOW_RISK, or SAFE]
     EXPLANATION: [Provide your human-level legal reasoning here]
     """
 
@@ -172,12 +173,15 @@ async def analyze_compliance_dialogue(payload: ChatHistoryRequest):
                 risk_level = "Safe"
                 flags = []
                 requires_more = False
-            elif "VERDICT: CRITICAL_HIGH_RISK" in reply.upper():
-                risk_score = max(risk_score, 85)
-                risk_level = "Critical"
+            elif "VERDICT: LOW_RISK" in reply.upper():
+                risk_score = clamp_score(risk_score, 20, 44)
+                risk_level = "Low"
             elif "VERDICT: MEDIUM_RISK" in reply.upper():
                 risk_score = clamp_score(risk_score, 25, 44)
                 risk_level = "Medium"
+            elif "VERDICT: CRITICAL_HIGH_RISK" in reply.upper():
+                risk_score = max(risk_score, 85)
+                risk_level = "Critical"
         else:
             reply = "Local AI loop tracking anomaly. Please verify Ollama system runtime parameters."
     except Exception as e:
