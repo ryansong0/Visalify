@@ -245,28 +245,3 @@ with col_right:
                     <p style='margin:6px 0 0 0; font-size:13px; color:#58a6ff;'><strong>Suggested Alternative:</strong> {flag.get('suggested_alternative')}</p>
                 </div>
             """, unsafe_allow_html = True)
-
-
-st.set_page_config(page_title = "VisaGuard Compliance AI", page_icon = "🛡️", layout = "wide")
-
-st.title("🛡️ VisaGuard: Compliance Analysis Dashboard")
-st.markdown("Evaluate job descriptions against TN Visa occupational restrictions using NLP context-awareness.")
-
-if "messages" not in st.session_state:
-    st.session_state.messages = [
-        {"role": "assistant", "content": "Hello! Paste a job profile description or summarize your role, and I will cross-reference it against 8 CFR regulations."}
-    ]
-if "telemetry" not in st.session_state:
-    st.session_state.telemetry = {
-        "risk_score": 0, "overall_risk_level": "Pending", "flags": [], "requires_more_info": True, "has_evaluated": False
-    }
-
-st.markdown("<br>", unsafe_allow_html = True)
-if st.button("🔄 Clear Analysis & Reset Session", use_container_width = True):
-        st.session_state.messages = [
-            {"role": "assistant", "content": "Hello! Paste a job profile description, upload a PDF resume, or summarize your role..."}
-        ]
-        st.session_state.telemetry = {
-            "risk_score": 0, "overall_risk_level": "Pending", "flags": [], "requires_more_info": True, "has_evaluated": False
-        }
-        st.rerun()
