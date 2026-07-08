@@ -183,6 +183,40 @@ with col_left:
         except requests.exceptions.ConnectionError:
             st.error("Infrastructure Offline: Please make sure your FastAPI Uvicorn server is running on port 8000.")
 
+with col_right:
+    st.markdown("<h3 style='font-size:16px; font-family:\"JetBrains Mono\"; color:#8b949e;'>[03] REAL-TIME TELEMETRY</h3>", unsafe_allow_html=True)
+    
+    tel = st.session_state.telemetry
+    score = tel.get("risk_score", 0)
+    level = tel.get("overall_risk_level", "Pending")
+    has_evaluated = tel.get("has_evaluated", False)
+    
+    # colors based on risk level
+    if level in ["Critical", "High"]:
+        color_hex = "#f85149"  
+    elif level == "Medium":
+        color_hex = "#d29922"  
+    elif level == "Safe":
+        color_hex = "#58a6ff"  
+    else:
+        color_hex = "#8b949e"  
+
+    # dashboard score metric blocks
+    m_col1, m_col2 = st.columns(2)
+    with m_col1:
+        st.metric(label="AUDIT RISK SCORE", value = f"{score} / 100")
+    with m_col2:
+        st.markdown(f"""
+            <div style='background: rgba(22, 27, 34, 0.6); border: 1px solid #30363d; border-radius:8px; padding:10px 20px; height:80px;'>
+                <p style='margin:0; font-size:12px; color:#8b949e; font-weight:600;'>RISK ASSIGNMENT</p>
+                <p style='margin:0; font-size:22px; font-weight:700; color:{color_hex}; font-family:\"JetBrains Mono\";'>{level.upper()}</p>
+            </div>
+        """, unsafe_allow_html = True)
+        
+    st.markdown("---")
+    st.markdown("<h4 style='font-size:14px; font-family:\"JetBrains Mono\"; color:#8b949e;'>STATUTORY VIOLATION MAP</h4>", unsafe_allow_html = True)
+
+
 st.set_page_config(page_title = "VisaGuard Compliance AI", page_icon = "🛡️", layout = "wide")
 
 st.title("🛡️ VisaGuard: Compliance Analysis Dashboard")
