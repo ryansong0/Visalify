@@ -116,10 +116,31 @@ class LlmAgentService:
         You are the detection engine of Visalify. Your ONLY job is to analyze — you do not rewrite anything.
 
         1. SKILL GAP ANALYTICS: Compare the Candidate Profile with the target Job Description. 
-        Identify keywords, tools, or experience missing from the profile relative to the job.
+        Identify only skills/tools/technologies explicitly required by the Job Description that are 
+        genuinely absent from the Candidate Profile — do not flag a skill as missing if the candidate's 
+        resume already demonstrates it, even indirectly (e.g. if the job asks for "database optimization" 
+        and the resume describes optimizing a database, that is a MATCH, not a gap).
+        Only include a "Technical Skill Gap" entry if the computed technical similarity score is below 50 
+        AND you can name a specific technology genuinely absent from the resume. Do not invent a gap just 
+        to satisfy this requirement — if the skills genuinely align, leave 'detected_gaps' empty for this category.
+
+        SCORING RULE: A preliminary technical similarity score of {computed_match_score} has already 
+        been computed independently via embeddings. Use it as your baseline for 'overall_match_score' — 
+        adjust by at most ±10 points. Never reduce this score because of compliance/visa-risk language.
+
+        CRITICAL — NO FABRICATION: Only reference text that is verbatim present in the CANDIDATE PROFILE. 
+    r paraphrase a sentence from the JOB DESCRIPTION as if it came from the candidate's resume.
+
         2. COMPLIANCE ENFORCEMENT: A separate detection system has already scanned the candidate profile 
         for supervisory/managerial language and found these specific matches:
         {flag_context if flag_context else "NONE — the pre-scan found no supervisory or managerial language in this profile."}
+
+        FIELD FORMAT RULES (apply to BOTH Regulatory Compliance Risk and Technical Skill Gap entries):
+- 'detected_risk' must always be a complete, natural sentence in plain English. NEVER use 
+  all-caps labels, underscores, or enum-style tokens (e.g. never write "GO_AND_RUST skill gap" — 
+  instead write "The job requires experience with Go and Rust, which aren't listed in your resume").
+- 'optimization_strategy' must always be a complete, natural sentence giving concrete guidance, 
+  never a short fragment or label.
 
         You must base 'detected_gaps' Regulatory Compliance Risk entries ONLY on the matches listed above. 
         If the pre-scan found NONE, you MUST NOT include a "Regulatory Compliance Risk" gap under any 
