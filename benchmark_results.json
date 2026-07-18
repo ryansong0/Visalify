@@ -5,8 +5,8 @@
       "expected_management": false,
       "detected_management": false,
       "expected_tier": "high",
-      "score": 55,
-      "length_ratio": 1.07,
+      "score": 57,
+      "length_ratio": 1.22,
       "banned_words_remaining": []
     },
     {
@@ -23,8 +23,8 @@
       "expected_management": false,
       "detected_management": false,
       "expected_tier": "high",
-      "score": 82,
-      "length_ratio": 1.0,
+      "score": 98,
+      "length_ratio": 1.03,
       "banned_words_remaining": []
     },
     {
@@ -32,8 +32,8 @@
       "expected_management": false,
       "detected_management": false,
       "expected_tier": "high",
-      "score": 75,
-      "length_ratio": 1.05,
+      "score": 80,
+      "length_ratio": 1.22,
       "banned_words_remaining": []
     },
     {
@@ -41,8 +41,8 @@
       "expected_management": false,
       "detected_management": false,
       "expected_tier": "high",
-      "score": 80,
-      "length_ratio": 1.0,
+      "score": 85,
+      "length_ratio": 1.28,
       "banned_words_remaining": []
     },
     {
@@ -50,8 +50,8 @@
       "expected_management": false,
       "detected_management": false,
       "expected_tier": "low",
-      "score": 38,
-      "length_ratio": 1.0,
+      "score": 21,
+      "length_ratio": 1.08,
       "banned_words_remaining": []
     },
     {
@@ -59,8 +59,8 @@
       "expected_management": false,
       "detected_management": false,
       "expected_tier": "low",
-      "score": 16,
-      "length_ratio": 0.65,
+      "score": 14,
+      "length_ratio": 1.0,
       "banned_words_remaining": []
     },
     {
@@ -68,7 +68,7 @@
       "expected_management": false,
       "detected_management": false,
       "expected_tier": "low",
-      "score": 1,
+      "score": 10,
       "length_ratio": 1.0,
       "banned_words_remaining": []
     },
@@ -77,8 +77,8 @@
       "expected_management": false,
       "detected_management": false,
       "expected_tier": "low",
-      "score": 42,
-      "length_ratio": 1.35,
+      "score": 24,
+      "length_ratio": 1.1,
       "banned_words_remaining": []
     },
     {
@@ -86,8 +86,8 @@
       "expected_management": false,
       "detected_management": false,
       "expected_tier": "low",
-      "score": 60,
-      "length_ratio": 1.63,
+      "score": 46,
+      "length_ratio": 1.13,
       "banned_words_remaining": []
     },
     {
@@ -95,8 +95,8 @@
       "expected_management": true,
       "detected_management": true,
       "expected_tier": "medium",
-      "score": 40,
-      "length_ratio": 1.65,
+      "score": 50,
+      "length_ratio": 1.6,
       "banned_words_remaining": []
     },
     {
@@ -105,7 +105,7 @@
       "detected_management": true,
       "expected_tier": "low",
       "score": 1,
-      "length_ratio": 1.46,
+      "length_ratio": 1.18,
       "banned_words_remaining": []
     },
     {
@@ -113,8 +113,8 @@
       "expected_management": true,
       "detected_management": true,
       "expected_tier": "medium",
-      "score": 58,
-      "length_ratio": 1.1,
+      "score": 64,
+      "length_ratio": 1.04,
       "banned_words_remaining": []
     },
     {
@@ -122,8 +122,8 @@
       "expected_management": true,
       "detected_management": true,
       "expected_tier": "low",
-      "score": 30,
-      "length_ratio": 1.55,
+      "score": 40,
+      "length_ratio": 1.43,
       "banned_words_remaining": []
     },
     {
@@ -132,7 +132,7 @@
       "detected_management": true,
       "expected_tier": "medium",
       "score": 40,
-      "length_ratio": 1.69,
+      "length_ratio": 1.04,
       "banned_words_remaining": []
     },
     {
@@ -140,8 +140,8 @@
       "expected_management": true,
       "detected_management": true,
       "expected_tier": "high",
-      "score": 65,
-      "length_ratio": 1.02,
+      "score": 75,
+      "length_ratio": 1.15,
       "banned_words_remaining": []
     },
     {
@@ -149,8 +149,8 @@
       "expected_management": true,
       "detected_management": true,
       "expected_tier": "high",
-      "score": 60,
-      "length_ratio": 0.97,
+      "score": 70,
+      "length_ratio": 1.11,
       "banned_words_remaining": []
     },
     {
@@ -159,7 +159,7 @@
       "detected_management": true,
       "expected_tier": "high",
       "score": 92,
-      "length_ratio": 1.25,
+      "length_ratio": 1.01,
       "banned_words_remaining": []
     },
     {
@@ -167,8 +167,8 @@
       "expected_management": false,
       "detected_management": false,
       "expected_tier": "medium",
-      "score": 72,
-      "length_ratio": 0.99,
+      "score": 69,
+      "length_ratio": 1.03,
       "banned_words_remaining": []
     },
     {
@@ -177,7 +177,7 @@
       "detected_management": false,
       "expected_tier": "medium",
       "score": 11,
-      "length_ratio": 1.04,
+      "length_ratio": 1.02,
       "banned_words_remaining": []
     },
     {
@@ -185,8 +185,8 @@
       "expected_management": false,
       "detected_management": false,
       "expected_tier": "medium",
-      "score": 60,
-      "length_ratio": 1.05,
+      "score": 56,
+      "length_ratio": 1.0,
       "banned_words_remaining": []
     },
     {
@@ -194,7 +194,7 @@
       "expected_management": false,
       "detected_management": false,
       "expected_tier": "medium",
-      "score": 47,
+      "score": 44,
       "length_ratio": 1.0,
       "banned_words_remaining": []
     },
@@ -203,8 +203,8 @@
       "expected_management": false,
       "detected_management": false,
       "expected_tier": "medium",
-      "score": 56,
-      "length_ratio": 1.08,
+      "score": 58,
+      "length_ratio": 1.02,
       "banned_words_remaining": []
     },
     {
@@ -212,8 +212,8 @@
       "expected_management": false,
       "detected_management": false,
       "expected_tier": "high",
-      "score": 52,
-      "length_ratio": 1.18,
+      "score": 51,
+      "length_ratio": 1.0,
       "banned_words_remaining": []
     },
     {
@@ -222,7 +222,7 @@
       "detected_management": false,
       "expected_tier": "high",
       "score": 50,
-      "length_ratio": 1.0,
+      "length_ratio": 1.6,
       "banned_words_remaining": []
     }
   ],
@@ -230,8 +230,8 @@
     "total_cases": 25,
     "hallucination_rate_pct": 0.0,
     "detection_recall_pct": 100.0,
-    "score_groundedness_pct": 72.0,
-    "avg_rewrite_length_ratio": 1.15,
+    "score_groundedness_pct": 76.0,
+    "avg_rewrite_length_ratio": 1.13,
     "banned_word_leakage_pct": 0.0
   }
 }

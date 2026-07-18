@@ -287,7 +287,7 @@ def run_benchmark():
     failed = [r for r in results if "error" in r]
 
     if failed:
-        print(f"\n⚠️  {len(failed)} requests failed entirely (see errors above)")
+        print(f"\nWARNING: {len(failed)} requests failed entirely (see errors above)")
 
     if not valid:
         print("No valid results to analyze.")
