@@ -40,7 +40,7 @@ REGULATORY_KB = [
         "mentored and supervised junior engineers on a team"
     ],
     "reason": "Supervisory management of engineering/technical staff is generally outside the scope of specialty-occupation or TN/H-1B individual-contributor roles.",
-    "alternative": "Reframe around individual technical contribution — architecture, implementation, hands-on delivery — rather than people oversight.",
+    "alternative": "Reframe around individual technical contribution: architecture, implementation, hands-on delivery, rather than people oversight.",
     "base_weight": 65
 }
 ]

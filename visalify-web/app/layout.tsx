@@ -22,7 +22,7 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Visalify — Visa-Safe Resume Review",
+  title: "Visalify: Visa-Safe Resume Review",
   description:
     "Check your resume against a target job and your visa category in one pass.",
 };

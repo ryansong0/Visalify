@@ -241,13 +241,13 @@ st.markdown("""
     </style>
 """, unsafe_allow_html = True)
 
-st.markdown('<div class="brand-mark">Visalify — Immigration-Safe Resume Review</div>', unsafe_allow_html=True)
+st.markdown('<div class="brand-mark">Visalify: Immigration-Safe Resume Review</div>', unsafe_allow_html=True)
 st.markdown('<div class="main-title">Sound like an expert.<br>Not a manager.</div>', unsafe_allow_html=True)
 st.markdown("""
     <p class="main-subtitle">
         Typical resume advice pushes leadership words like "managed" or "led." But for
         specialized technical visas, that same language can read as evidence you're a
-        corporate manager rather than the hands-on expert the role requires — a common
+        corporate manager rather than the hands-on expert the role requires, a common
         trigger for rejection. <strong>Paste your resume and the target job below</strong> and
         we'll show you exactly where that risk shows up, then rewrite it.
     </p>
@@ -291,7 +291,7 @@ if run:
                     stamp_class = "safe" if is_safe else "risk"
  
                     st.markdown('<hr class="hairline">', unsafe_allow_html=True)
-                    st.markdown('<div class="step-eyebrow">03 — COMPLIANCE REVIEW</div>', unsafe_allow_html=True)
+                    st.markdown('<div class="step-eyebrow">03: COMPLIANCE REVIEW</div>', unsafe_allow_html=True)
  
                     st.markdown(f"""
                         <div class="stamp-wrap">

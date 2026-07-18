@@ -118,6 +118,12 @@ async def match_and_optimize_profile(payload: JobMatchRequest):
         final_match_score = llm_score
 
     detected_gaps = detection_result.get("detected_gaps", [])
+    # The small local model occasionally emits a placeholder gap with blank
+    # detected_risk/optimization_strategy fields instead of real content — drop those.
+    detected_gaps = [
+        g for g in detected_gaps
+        if g.get("detected_risk", "").strip() and g.get("optimization_strategy", "").strip()
+    ]
     has_compliance_gap = any(g.get("category") == "Regulatory Compliance Risk" for g in detected_gaps)
 
     if not keyword_result["flags"]:
@@ -144,7 +150,7 @@ async def match_and_optimize_profile(payload: JobMatchRequest):
         detected_gaps.append({
             "category": "Regulatory Compliance Risk",
             "detected_risk": f"Your resume contains supervisory/managerial language (e.g., \"{matched_text}\") that may fall outside the individual-contributor scope typically required for this visa classification.",
-            "optimization_strategy": f"Reframe this language around hands-on technical contribution rather than people management — for example: {alternative}."
+            "optimization_strategy": f"Reframe this language around hands-on technical contribution rather than people management, for example: {alternative}."
         })
 
     optimized_profile = await LlmAgentService.run_rewrite_pipeline(

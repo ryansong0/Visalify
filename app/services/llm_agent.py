@@ -230,8 +230,12 @@ class LlmAgentService:
         Example: "Managed a team of 6 engineers building microservices" becomes "Architected and 
         implemented microservices, collaborating with a 6-person engineering team on system design."
 
-        Keep all technical skills, metrics, and factual content intact — only reframe the 
+        Keep all technical skills, metrics, and factual content intact — only reframe the
         supervisory language. Output must be plain text only: no HTML tags, no markdown, no code fences.
+        Preserve the ORIGINAL structure exactly: the same sentences in the same order, as flowing prose.
+        Do not reformat the resume into a different structure — no JSON, no labeled fields like "title:"
+        or "experience:", no bullet lists unless the original already used them. The output should read
+        like the same resume, not a re-templated version of it.
         The final text must contain ZERO instances of "managed," "led," "directed," "overseeing," or "oversaw."
 
         CRITICAL: Your output must be the FULL rewritten resume, matching the original in length and 

@@ -79,13 +79,13 @@ export default function Home() {
           </h1>
           <p className="mt-5 max-w-2xl text-[1.05rem] leading-relaxed text-muted">
             Typical resume advice pushes leadership words like &ldquo;managed&rdquo; or &ldquo;led.&rdquo;
-            Immigration officers often read those same words as a sign you&rsquo;ve moved into management —
+            Immigration officers often read those same words as a sign you&rsquo;ve moved into management,
             which can put a specialized technical visa at risk.
           </p>
 
           <div className="mt-6 border-l-2 border-seal bg-seal-light/60 px-5 py-4 max-w-2xl">
             <p className="text-sm leading-relaxed text-ink/80">
-              <span className="font-semibold text-ink">How it works —</span> paste your resume on the left,
+              <span className="font-semibold text-ink">How it works:</span> paste your resume on the left,
               the job you&rsquo;re targeting on the right. Visalify flags language that could read as a visa
               risk, and rewrites it to keep your match strength intact.
             </p>
