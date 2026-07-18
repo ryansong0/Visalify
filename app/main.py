@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from app.config import settings
 from app.schemas import ChatHistoryRequest, ChatAnalysisResponse, JobMatchRequest, JobMatchResponse
 from app.services.vector_scan import vector_scanner
@@ -15,6 +15,9 @@ import uvicorn
 import traceback
 import re
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 
 app = FastAPI(title = settings.APP_NAME, version = settings.VERSION)
@@ -24,8 +27,26 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Public deployment runs against a free-tier Groq API key shared by every visitor —
+# these limits keep the daily quota from being exhausted by one heavy user.
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+
+def _reject_oversized_input(*texts: str) -> None:
+    for text in texts:
+        if len(text) > settings.MAX_INPUT_CHARS:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Input exceeds the {settings.MAX_INPUT_CHARS}-character limit for this demo."
+            )
+
+
 @app.post("/chat", response_model = ChatAnalysisResponse)
-async def analyze_compliance_dialogue(payload: ChatHistoryRequest):
+@limiter.limit("5/minute")
+async def analyze_compliance_dialogue(request: Request, payload: ChatHistoryRequest):
     user_messages = [m.content for m in payload.history if m.role == "user"]
     if not user_messages:
         return ChatAnalysisResponse(
@@ -37,6 +58,7 @@ async def analyze_compliance_dialogue(payload: ChatHistoryRequest):
         )
         
     latest_user_input = user_messages[-1]
+    _reject_oversized_input(latest_user_input)
 
     risk_score, risk_level, requires_more, flags = vector_scanner.scan(
         latest_user_input
@@ -81,11 +103,14 @@ async def analyze_compliance_dialogue(payload: ChatHistoryRequest):
     )
 
 @app.post("/match", response_model=JobMatchResponse)
-async def match_and_optimize_profile(payload: JobMatchRequest):
+@limiter.limit("5/minute")
+async def match_and_optimize_profile(request: Request, payload: JobMatchRequest):
     """
     Two-stage pipeline: detection+scoring first, then a separate rewrite call
     that only ever sees the resume text (never the job description).
     """
+    _reject_oversized_input(payload.candidate_profile, payload.job_description)
+
     _, _, _, semantic_flags = vector_scanner.scan(payload.candidate_profile)
     semantic_lines = [f"- Flagged Text Segment: '{f.matched_text}'\n Reason: {f.reason}" for f in semantic_flags]
 
