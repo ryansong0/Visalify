@@ -2,17 +2,17 @@
 
 **Live demo:** [visalify-app.vercel.app](https://visalify-app.vercel.app)
 
-Visalify checks a candidate's resume against a target job description for TN/H-1B-style visa roles, flags language that could read as a visa-compliance risk (supervisory/managerial phrasing that undercuts an "individual contributor" role classification), and rewrites the resume to reframe that language as hands-on technical work — without inventing skills or dropping content.
+TN and H-1B visa rules require most specialty-occupation roles to stay hands-on technical, not managerial. The problem is that standard resume advice pushes exactly the kind of language ("managed a team," "led the initiative") that can read as a red flag to an immigration officer. Visalify checks a resume against a target job description, flags any supervisory language that could put a visa at risk, and rewrites it into hands-on technical framing, keeping every real skill and detail intact.
 
 ## How it works
 
-1. **Pre-scan** — a lightweight keyword pass (regex-based word-form matching) and a lexical similarity pass (TF-IDF cosine similarity against a small regulatory knowledge base) independently flag any supervisory/managerial language in the resume. Both run on pure NumPy/scikit-learn — no large ML models to download or load into memory, so the whole backend stays small enough to run comfortably on free-tier hosting.
-2. **Detection** — an LLM call (Groq, `llama-3.3-70b-versatile`) scores the resume/job match and reports compliance risks and skill gaps. The pre-scan is the deterministic source of truth for *whether* a compliance risk exists — the LLM's role is limited to phrasing and skill-gap analysis, not judgment calls a small model turned out to be unreliable at.
-3. **Rewrite** — a second, separate LLM call reframes any flagged sentences into individual-technical-contribution language, with a deterministic regex-based scrub as a final safety net so banned supervisory terms can never leak through.
+1. **Pre-scan.** A keyword pass (regex-based word matching) and a lexical similarity pass (TF-IDF cosine similarity against a small regulatory knowledge base) each independently flag supervisory language in the resume. Both run on plain NumPy and scikit-learn, so there's no ML model to download and the backend stays small enough for free-tier hosting.
+2. **Detection.** A Groq-hosted `llama-3.3-70b-versatile` call scores the resume against the job description and reports compliance risks and skill gaps. The pre-scan decides *whether* a compliance risk exists; the LLM only handles phrasing and skill-gap analysis. Early on, letting the LLM make that call directly caused it to miss most real risks, so that decision was moved to the deterministic pre-scan instead.
+3. **Rewrite.** A second, separate LLM call reframes any flagged sentences around individual technical contribution. A regex-based scrub runs afterward as a last check, so a banned supervisory term can never make it into the output.
 
 ## Verified results
 
-Measured against a labeled 25-resume validation set (`benchmark_visalify.py`):
+Measured against a labeled set of 25 resumes (`benchmark_visalify.py`):
 
 | Metric | Result |
 |---|---|
@@ -22,15 +22,15 @@ Measured against a labeled 25-resume validation set (`benchmark_visalify.py`):
 | Banned-word leakage in rewrites | 0% (0/8) |
 | Overall classification accuracy | 100% (25/25) |
 
-Separately, `perf_benchmark.py` verifies that replacing a nested-loop cosine-similarity comparison with vectorized NumPy matrix operations produces **bit-for-bit identical output** while cutting the similarity-scoring step's latency by **86%**.
+`perf_benchmark.py` covers a separate change: swapping a nested-loop cosine-similarity comparison for vectorized NumPy matrix operations. It checks the two produce identical output first, then measures a 86% latency drop on that step.
 
-Both scripts are runnable and reproducible — see below.
+Both scripts are meant to be run, not just read - see below.
 
 ## Stack
 
-- **Backend**: FastAPI, scikit-learn (TF-IDF), Groq API — deliberately dependency-light so it fits free-tier hosting without a GPU or large memory footprint
+- **Backend**: FastAPI, scikit-learn (TF-IDF), Groq API
 - **Frontend**: Next.js
-- Both deployed as separate Vercel projects from this same repo (backend as a Python serverless function, frontend as the Next.js app in `visalify-web/`)
+- Deployed as two separate Vercel projects from this repo: the backend as a Python function, the frontend from `visalify-web/`
 
 ## Running locally
 
@@ -45,7 +45,7 @@ npm install
 npm run dev
 ```
 
-Requires a free [Groq API key](https://console.groq.com/keys) in a `.env` file (see `.env.example`).
+You'll need a free [Groq API key](https://console.groq.com/keys) in a `.env` file (see `.env.example`).
 
 ## Reproducing the benchmarks
 
