@@ -1,0 +1,17 @@
+venv/
+.venv/
+node_modules/
+visalify-web/
+.git/
+.claude/
+.vscode/
+__pycache__/
+*.pyc
+.env
+.env.example
+benchmark.py
+benchmark_visalify.py
+benchmark_results.json
+perf_benchmark.py
+app_frontend.py
+requirements.txt

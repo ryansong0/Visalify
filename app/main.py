@@ -23,7 +23,7 @@ from slowapi.errors import RateLimitExceeded
 app = FastAPI(title = settings.APP_NAME, version = settings.VERSION)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[origin.strip() for origin in settings.CORS_ORIGINS.split(",") if origin.strip()],
     allow_methods=["*"],
     allow_headers=["*"],
 )
