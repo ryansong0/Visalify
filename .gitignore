@@ -2,6 +2,13 @@ node_modules/
 venv/
 .venv/
 __pycache__/
+*.pyc
 .streamlit/
 *.zip
 .env
+visalify-web/.env.local
+.claude/
+visalify-web/.next/
+visalify-web/out/
+.DS_Store
+*.log
