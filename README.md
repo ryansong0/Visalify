@@ -8,7 +8,7 @@ TN and H-1B visa rules require most specialty-occupation roles to stay hands-on 
 
 ## How it works
 
-1. **Pre-scan.** A keyword pass (regex-based word matching) and a lexical similarity pass (TF-IDF cosine similarity against a small regulatory knowledge base) each independently flag supervisory language in the resume. Both run on plain NumPy and scikit-learn, so there's no ML model to download and the backend stays small enough for free-tier hosting.
+1. **Pre-scan.** A keyword pass (regex-based word matching) and a similarity pass (TF-IDF cosine similarity against a small regulatory knowledge base) each independently flag supervisory language in the resume. Both run on plain NumPy and scikit-learn, so there's no ML model to download and the backend stays small enough for free-tier hosting.
 2. **Detection.** A Groq-hosted `llama-3.3-70b-versatile` call scores the resume against the job description and reports compliance risks and skill gaps. The pre-scan decides *whether* a compliance risk exists; the LLM only handles phrasing and skill-gap analysis. Early on, letting the LLM make that call directly caused it to miss most real risks, so that decision was moved to the deterministic pre-scan instead.
 3. **Rewrite.** A second, separate LLM call reframes any flagged sentences around individual technical contribution. A regex-based scrub runs afterward as a last check, so a banned supervisory term can never make it into the output.
 
@@ -47,7 +47,7 @@ npm install
 npm run dev
 ```
 
-You'll need a free [Groq API key](https://console.groq.com/keys) in a `.env` file (see `.env.example`).
+(Note: You'll need a free [Groq API key](https://console.groq.com/keys) in a `.env` file (see `.env.example`)).
 
 ## Reproducing the benchmarks
 
