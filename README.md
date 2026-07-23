@@ -4,6 +4,8 @@
 
 TN and H-1B visa rules require most specialty-occupation roles to stay hands-on technical, not managerial. The problem is that standard resume advice pushes exactly the kind of language ("managed a team," "led the initiative") that can read as a red flag to an immigration officer. Visalify checks a resume against a target job description, flags any supervisory language that could put a visa at risk, and rewrites it into hands-on technical framing, keeping every real skill and detail intact.
 
+![Visalify demo: flags supervisory language and rewrites it to compliant technical framing](./screenshots/demo.png)
+
 ## How it works
 
 1. **Pre-scan.** A keyword pass (regex-based word matching) and a lexical similarity pass (TF-IDF cosine similarity against a small regulatory knowledge base) each independently flag supervisory language in the resume. Both run on plain NumPy and scikit-learn, so there's no ML model to download and the backend stays small enough for free-tier hosting.
